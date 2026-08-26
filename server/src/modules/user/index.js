@@ -1,7 +1,4 @@
-const userRepository = require("./user.repository");
-const userService = require("./user.service");
+import userRepository from "./user.repository.js";
+import userService from "./user.service.js";
 
-module.exports = {
-    userRepository,
-    userService,
-};
+export { userRepository, userService };

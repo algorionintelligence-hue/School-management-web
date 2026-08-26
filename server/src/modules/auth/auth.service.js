@@ -1,122 +1,77 @@
-const schoolRepository = require("../school/school.repository");
-const userRepository = require("../user/user.repository");
+import { User } from '../user/user.schema.js';
+import { School } from '../school/school.schema.js';
+import { Teacher } from '../teacher/teacher.schema.js';
+import { Student } from '../student/student.schema.js';
+import { UnauthorizedException, NotFoundException } from '../../common/errors/HttpException.js';
+import { comparePassword } from '../../common/utils/password.util.js';
+import { generateToken } from '../../common/utils/jwt.util.js';
 
-const { comparePassword } = require("../../utils/password");
-const { generateAccessToken } = require("../../utils/jwt");
+export class AuthService {
+  async login(loginDto) {
+    const { email, password, domain } = loginDto;
 
-const AuthenticationError = require("../../common/errors/AuthenticationError");
-const AppError = require("../../common/errors/AppError");
+    // Find user by domain and email
+    const user = await User.findOne({ domain, email }).select('+passwordHash');
 
-const login = async ({
-    email,
-    password,
-    domain,
-}) => {
+    if (!user || !user.isActive) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
-    /**
-     * STEP 1
-     * Find the school using the domain.
-     */
-    const school = await schoolRepository.findByDomain(domain);
+    // Verify password
+    const isMatch = await comparePassword(password, user.passwordHash);
+    if (!isMatch) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
+    // Verify school is active
+    const school = await School.findOne({ _id: user.schoolId, isActive: true });
     if (!school) {
-        throw new AuthenticationError(
-            "Invalid domain or credentials"
-        );
+      throw new UnauthorizedException('School is not active');
     }
 
-    /**
-     * STEP 2
-     * Make sure the school is allowed to login.
-     */
-    if (school.status !== "active") {
-        throw new AuthenticationError(
-            "School account is not active"
-        );
+    // Update last login
+    await User.findByIdAndUpdate(user._id, { lastLoginAt: new Date() });
+
+    // Load role-specific profile
+    let profile = null;
+    if (user.role === 'teacher') {
+      profile = await Teacher.findOne({ userId: user._id });
+    } else if (user.role === 'student') {
+      profile = await Student.findOne({ userId: user._id });
     }
 
-    /**
-     * STEP 3
-     * Find the user INSIDE this school.
-     *
-     * This is the important tenant boundary.
-     */
-    const user = await userRepository.findByEmailAndSchool({
-        email,
-        schoolId: school._id,
-    });
-
-    if (!user) {
-        throw new AuthenticationError(
-            "Invalid domain or credentials"
-        );
-    }
-
-    /**
-     * STEP 4
-     * Check user status.
-     */
-    if (user.status !== "active") {
-        throw new AuthenticationError(
-            "User account is not active"
-        );
-    }
-
-    /**
-     * STEP 5
-     * Verify password.
-     */
-    const passwordMatches = await comparePassword(
-        password,
-        user.passwordHash
-    );
-
-    if (!passwordMatches) {
-        throw new AuthenticationError(
-            "Invalid domain or credentials"
-        );
-    }
-
-    /**
-     * STEP 6
-     * Generate JWT.
-     *
-     * The JWT contains schoolId.
-     */
-    const accessToken = generateAccessToken(user);
-
-    /**
-     * STEP 7
-     * Update login timestamp.
-     */
-    user.lastLoginAt = new Date();
-
-    await user.save();
-
-    /**
-     * STEP 8
-     * Return safe user information.
-     */
-    return {
-        accessToken,
-
-        user: {
-            id: user._id,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            role: user.role,
-        },
-
-        school: {
-            id: school._id,
-            businessId: school.businessId,
-            domain: school.domain,
-            name: school.name,
-        },
+    // Generate JWT token
+    const payload = {
+      userId: user._id.toString(),
+      schoolId: user.schoolId.toString(),
+      role: user.role,
+      email: user.email,
     };
-};
 
-module.exports = {
-    login,
-};
+    const token = generateToken(payload);
+
+    return {
+      token,
+      user: {
+        userId: user._id.toString(),
+        schoolId: user.schoolId.toString(),
+        role: user.role,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        profile,
+      },
+    };
+  }
+
+  async validateToken(token) {
+    const { verifyToken } = await import('../../common/utils/jwt.util.js');
+    try {
+      return verifyToken(token);
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
+}
+
+export const authService = new AuthService();

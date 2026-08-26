@@ -1,0 +1,107 @@
+import mongoose from 'mongoose'
+
+const schoolSchema = new mongoose.Schema(
+    {
+        businessId: {
+            type: String,
+            required: true,
+            unique: true,
+            immutable: true,
+            trim: true,
+            index: true,
+        },
+
+        domain: {
+            type: String,
+            required: true,
+            unique: true,
+            lowercase: true,
+            trim: true,
+            index: true,
+        },
+
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+
+        legalName: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+
+        email: {
+            type: String,
+            required: true,
+            lowercase: true,
+            trim: true,
+        },
+
+        phone: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+
+        address: {
+            city: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+
+            state: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+
+            country: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+
+            postalCode: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+        },
+
+        logo: {
+            type: String,
+            default: null,
+            trim: true,
+        },
+
+        status: {
+            type: String,
+            enum: ["active", "inactive", "suspended"],
+            default: "active",
+            index: true,
+        },
+
+        timezone: {
+            type: String,
+            required: true,
+            default: "Asia/Karachi",
+            trim: true,
+        },
+        locale: {
+            type: String,
+            required: true,
+            default: "en-PK",
+            trim: true,
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+schoolSchema.index({ domain: 1, isActive: 1 });
+schoolSchema.index({ businessId: 1, isActive: 1 });
+export const School = mongoose.model("School", schoolSchema);

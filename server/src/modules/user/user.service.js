@@ -1,4 +1,4 @@
-const userRepository = require("./user.repository");
+import * as userRepository from "./user.repository.js";
 
 const getUserByEmailAndSchool = async ({
     email,
@@ -10,6 +10,4 @@ const getUserByEmailAndSchool = async ({
     });
 };
 
-module.exports = {
-    getUserByEmailAndSchool,
-};
+export { getUserByEmailAndSchool };

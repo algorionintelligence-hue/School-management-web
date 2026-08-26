@@ -1,3 +1,4 @@
+import { z } from "zod";
 
 const loginDto = z.object({
     email: z
@@ -15,4 +16,4 @@ const loginDto = z.object({
         .transform((value) => value.toLowerCase().trim()),
 });
 
-module.exports = loginDto;
+export default loginDto;

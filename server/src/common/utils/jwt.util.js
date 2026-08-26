@@ -1,7 +1,7 @@
-import jsonwebtoken from 'jsonwebtoken'
-const env = require("../config/env");
+import jwt from "jsonwebtoken";
+import env from "../../config/env.js";
 
-const generateAccessToken = (user) => {
+const generateToken = (user) => {
     return jwt.sign(
         {
             sub: user._id.toString(),
@@ -17,11 +17,8 @@ const generateAccessToken = (user) => {
     );
 };
 
-const verifyAccessToken = (token) => {
+const verifyToken = (token) => {
     return jwt.verify(token, env.jwtSecret);
 };
 
-module.exports = {
-    generateAccessToken,
-    verifyAccessToken,
-};
+export { generateToken, verifyToken };

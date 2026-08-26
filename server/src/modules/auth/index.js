@@ -1,5 +1,3 @@
-const authService = require("./auth.service");
+import * as authService from "./auth.service.js";
 
-module.exports = {
-    authService,
-};
+export { authService };

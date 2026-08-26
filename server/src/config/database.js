@@ -1,6 +1,7 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose";
+import env from "./env.js";
 
-const connectDatabase = async () => {
+export const connectDatabase = async () => {
     try {
         await mongoose.connect(env.mongodbUri);
 
@@ -11,5 +12,3 @@ const connectDatabase = async () => {
         process.exit(1);
     }
 };
-
-module.exports = connectDatabase;

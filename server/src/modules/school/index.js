@@ -1,7 +1,4 @@
-const schoolRepository = require("./school.repository");
-const schoolService = require("./school.service");
+import schoolRepository from "./school.repository.js";
+import schoolService from "./school.service.js";
 
-module.exports = {
-    schoolRepository,
-    schoolService,
-};
+export { schoolRepository, schoolService };

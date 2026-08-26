@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs'
+import bcrypt from "bcryptjs";
 const SALT_ROUNDS = 12;
 
 const hashPassword = async (password) => {
@@ -9,7 +9,4 @@ const comparePassword = async (password, passwordHash) => {
     return bcrypt.compare(password, passwordHash);
 };
 
-module.exports = {
-    hashPassword,
-    comparePassword,
-};
+export { hashPassword, comparePassword };

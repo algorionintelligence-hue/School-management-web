@@ -1,4 +1,4 @@
-const User = require("./user.model");
+import User from "./user.schema.js";
 
 const findByEmailAndSchool = async ({
     email,
@@ -18,8 +18,4 @@ const create = async (data) => {
     return User.create(data);
 };
 
-module.exports = {
-    findByEmailAndSchool,
-    findById,
-    create,
-};
+export { findByEmailAndSchool, findById, create };

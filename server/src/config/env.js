@@ -1,4 +1,4 @@
-import dotenv from 'dotenv'
+import "dotenv/config";
 
 const env = {
     port: process.env.PORT || 5000,
@@ -18,4 +18,4 @@ if (!env.jwtSecret) {
     throw new Error("JWT_SECRET is not defined");
 }
 
-module.exports = env;   
+export default env;

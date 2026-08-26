@@ -1,16 +1,31 @@
-const app = require("./app");
-const connectDatabase = require("./config/database");
-const env = require("./config/env");
+import dotenv from 'dotenv';
+dotenv.config();
 
-const startServer = async () => {
+import app from './app.js';
+import { connectDatabase } from './config/database.js';
 
-    await connectDatabase();
+const PORT = process.env.PORT
 
-    app.listen(env.port, () => {
-        console.log(
-            `Server running on port ${env.port}`
-        );
-    });
-};
+// Connect to database
+connectDatabase();
 
-startServer();
+// Start server
+const server = app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err);
+  server.close(() => {
+    process.exit(1);
+  });
+});
+
+// Handle SIGTERM
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully...');
+  server.close(() => {
+    console.log('Process terminated!');
+  });
+});

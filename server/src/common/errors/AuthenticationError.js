@@ -1,4 +1,4 @@
-const AppError = require("./AppError");
+import AppError from "./AppError.js";
 
 class AuthenticationError extends AppError {
     constructor(message = "Invalid credentials") {
@@ -6,4 +6,4 @@ class AuthenticationError extends AppError {
     }
 }
 
-module.exports = AuthenticationError;
+export default AuthenticationError;
