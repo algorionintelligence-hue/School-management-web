@@ -1,0 +1,59 @@
+/* Layout.css - handles the overall page chrome */
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Mobile overlay when sidebar is open */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  backdrop-filter: blur(2px);
+}
+
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.3s ease;
+  min-width: 0; /* prevent overflow */
+  width: 0; /* force flex child to shrink */
+}
+
+.main-content.sidebar-closed {
+  margin-left: var(--sidebar-collapsed);
+}
+
+.content-area {
+  padding: 24px;
+  min-height: calc(100vh - var(--header-height));
+}
+
+/* ── Tablet (≤ 1024px) ─────────────────────────── */
+@media (max-width: 1024px) {
+  .content-area {
+    padding: 20px 16px;
+  }
+}
+
+/* ── Mobile (≤ 768px) ──────────────────────────── */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+
+  .content-area {
+    padding: 16px 12px;
+  }
+}
+
+/* ── Small mobile (≤ 480px) ────────────────────── */
+@media (max-width: 480px) {
+  .content-area {
+    padding: 12px 8px;
+  }
+}
