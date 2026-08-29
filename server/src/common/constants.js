@@ -56,6 +56,25 @@ export const SchoolStatus = {
   SUSPENDED: 'suspended',
 };
 
+export const SchoolRange = Object.freeze({
+    PRIMARY_TO_SECONDARY: "1-10",
+    HIGHER_SECONDARY: "11-12",
+});
+
+export const SchoolShift = Object.freeze({
+    MORNING: "morning",
+    EVENING: "evening",
+});
+
+export const SchoolBoard = Object.freeze({
+    FEDERAL: "Federal Board",
+    SINDH: "Sindh Board",
+    PUNJAB: "Punjab Board",
+    BALOCHISTAN: "Balochistan Board",
+    KHYBER_PAKHTUNKHWA: "Khyber Pakhtunkhwa Board",
+    PRIVATE: "Private Board",
+});
+
 // Helper function to get all enum values
 export const getEnumValues = (enumObj) => {
   return Object.values(enumObj);

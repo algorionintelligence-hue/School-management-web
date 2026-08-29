@@ -49,6 +49,15 @@ export class SchoolService {
 
             logo:
               data.logo || null,
+            establishedYear: data.establishedYear,
+
+            schoolRange: data.schoolRange,
+
+            shift: data.shift,
+
+            numberOfCampus: data.numberOfCampus,
+
+            selectedBoard: data.selectedBoard,
 
             timezone:
               data.timezone ||
