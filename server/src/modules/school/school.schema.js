@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-
+import { SchoolRange, SchoolShift, SchoolBoard } from '../../common/constants';
 const schoolSchema = new mongoose.Schema(
     {
         businessId: {
@@ -82,6 +82,37 @@ const schoolSchema = new mongoose.Schema(
             enum: ["active", "inactive", "suspended"],
             default: "active",
             index: true,
+        },
+
+        establishedYear: {
+            type: Number,
+            required: true,
+            min: 1800,
+            max: new Date().getFullYear(),
+        },
+
+        schoolRange: {
+            type: String,
+            enum: Object.values(SchoolRange),
+            required: true,
+        },
+
+        shift: {
+            type: String,
+            enum: Object.values(SchoolShift),
+            required: true,
+        },
+
+        numberOfCampus: {
+            type: Number,
+            required: true,
+            min: 1,
+        },
+
+        selectedBoard: {
+            type: String,
+            enum: Object.values(SchoolBoard),
+            required: true,
         },
 
         timezone: {

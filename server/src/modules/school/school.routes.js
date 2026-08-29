@@ -14,6 +14,44 @@ const createSchoolValidation = [
   body('phone').optional().trim().isString(),
   body('logoUrl').optional().trim().isString(),
   body('timezone').optional().trim().isString(),
+  body("establishedYear")
+        .notEmpty()
+        .withMessage("Established year is required")
+        .isInt({
+            min: 1800,
+            max: new Date().getFullYear(),
+        })
+        .withMessage("Invalid established year"),
+
+    body("schoolRange")
+        .notEmpty()
+        .withMessage("School range is required")
+        .isString()
+        .withMessage("School range must be a string")
+        .isIn(Object.values(SCHOOL_RANGE))
+        .withMessage("Invalid school range"),
+
+    body("shift")
+        .notEmpty()
+        .withMessage("Shift is required")
+        .isString()
+        .withMessage("Shift must be a string")
+        .isIn(Object.values(SCHOOL_SHIFT))
+        .withMessage("Invalid school shift"),
+
+    body("numberOfCampus")
+        .notEmpty()
+        .withMessage("Number of campuses is required")
+        .isInt({ min: 1 })
+        .withMessage("Number of campuses must be at least 1"),
+
+    body("selectedBoard")
+        .notEmpty()
+        .withMessage("Selected board is required")
+        .isString()
+        .withMessage("Selected board must be a string")
+        .isIn(Object.values(SCHOOL_BOARD))
+        .withMessage("Invalid school board"),
   body("admin")
         .notEmpty()
         .withMessage("Admin information is required")
