@@ -34,7 +34,6 @@ export class StudentService {
       phone: createStudentDto.phone,
       gender: createStudentDto.gender,
       dateOfBirth: createStudentDto.dateOfBirth ? new Date(createStudentDto.dateOfBirth) : undefined,
-      studentId: createStudentDto.studentId,
       isActive: true,
     });
 

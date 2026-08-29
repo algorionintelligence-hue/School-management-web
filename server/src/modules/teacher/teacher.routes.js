@@ -3,6 +3,7 @@ import { teacherController } from './teacher.controller.js';
 import { authMiddleware } from '../../common/middleware/auth.middleware.js';
 import { validateMiddleware } from '../../common/middleware/validation.middleware.js';
 import { body } from 'express-validator';
+import { verifyToken } from '../../common/utils/jwt.util.js';
 
 const router = Router();
 
@@ -19,9 +20,7 @@ const createTeacherValidation = [
   body('department').optional().trim(),
   body('specialization').optional().trim(),
   body('qualifications').optional().isArray(),
-  body('officeRoom').optional().trim(),
   body('joiningDate').optional().isISO8601(),
-  body('isHeadOfDepartment').optional().isBoolean(),
 ];
 
 router.use(authMiddleware);

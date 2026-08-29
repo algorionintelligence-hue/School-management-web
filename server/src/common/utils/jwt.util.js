@@ -4,11 +4,13 @@ import env from "../../config/env.js";
 const generateToken = (user) => {
     return jwt.sign(
         {
-            sub: user._id.toString(),
+            sub: user._id || user.userId,
 
-            schoolId: user.schoolId.toString(),
+            schoolId: user.schoolId,
 
             role: user.role,
+
+            email: user.email,
         },
         env.jwtSecret,
         {

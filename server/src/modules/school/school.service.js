@@ -1,13 +1,18 @@
+import mongoose from 'mongoose';
 import { School } from './school.schema.js';
+import { User } from '../user/user.schema.js';
 import { ConflictException, NotFoundException } from '../../common/errors/HttpException.js';
+import AppError from '../../common/errors/AppError.js';
+import { hashPassword } from '../../common/utils/password.util.js';
 import generateBusinessId from '../../common/utils/businessId.util.js';
 import { UserRole } from '../../common/constants.js';
 export class SchoolService {
   async create(data) {
 
     const session = await mongoose.startSession();
+    session.startTransaction();
     try {
-      session.startTransaction();
+      const normalizedDomain = data.domain.toLowerCase().trim();
       const existingSchool =
         await School.findOne({
           domain: data.domain.toLowerCase()
@@ -26,11 +31,7 @@ export class SchoolService {
         [
           {
             businessId,
-
-            domain:
-              data.domain
-                .toLowerCase()
-                .trim(),
+            domain: normalizedDomain,
             name:
               data.name,
 

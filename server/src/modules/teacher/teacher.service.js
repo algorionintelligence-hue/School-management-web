@@ -3,7 +3,7 @@ import { Teacher } from './teacher.schema.js';
 import { User } from '../user/user.schema.js';
 import { ConflictException, NotFoundException } from '../../common/errors/HttpException.js';
 import { hashPassword } from '../../common/utils/password.util.js';
-
+import { UserRole } from '../../common/constants.js';
 export class TeacherService {
   async create(schoolId, domain, createTeacherDto) {
     const { ObjectId } = mongoose.Types;
@@ -23,11 +23,10 @@ export class TeacherService {
 
     // Create user
     const createdUser = await User.create({
-      schoolId: new ObjectId(schoolId),
-      role: 'teacher',
+      schoolId: schoolId,
+      role: UserRole.TEACHER,
       email: createTeacherDto.email,
       passwordHash,
-      domain,
       firstName: createTeacherDto.firstName,
       lastName: createTeacherDto.lastName,
       middleName: createTeacherDto.middleName,
@@ -41,13 +40,11 @@ export class TeacherService {
     // Create teacher profile
     const createdTeacher = await Teacher.create({
       userId: createdUser._id,
-      schoolId: new ObjectId(schoolId),
+      schoolId: schoolId,
       department: createTeacherDto.department,
       specialization: createTeacherDto.specialization,
       qualifications: createTeacherDto.qualifications,
-      officeRoom: createTeacherDto.officeRoom,
-      joiningDate: createTeacherDto.joiningDate ? new Date(createTeacherDto.joiningDate) : undefined,
-      isHeadOfDepartment: createTeacherDto.isHeadOfDepartment || false,
+      joiningDate: createTeacherDto.joiningDate ? new Date(createTeacherDto.joiningDate) : undefined
     });
 
     return createdTeacher.toObject();

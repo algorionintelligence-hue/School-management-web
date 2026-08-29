@@ -15,7 +15,6 @@ const createStudentValidation = [
   body('phone').optional().trim(),
   body('gender').optional().trim(),
   body('dateOfBirth').optional().isISO8601(),
-  body('studentId').optional().trim(),
   body('gradeLevel').optional().trim(),
   body('section').optional().trim(),
   body('rollNumber').optional().trim(),
