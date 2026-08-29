@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { SchoolRange, SchoolShift, SchoolBoard } from '../../common/constants';
+import { SchoolRange, SchoolShift, SchoolBoard } from '../../common/constants.js';
 const schoolSchema = new mongoose.Schema(
     {
         businessId: {

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { schoolController } from './school.controller.js';
 import { validateMiddleware } from '../../common/middleware/validation.middleware.js';
 import { body } from 'express-validator';
+import { SchoolRange, SchoolBoard, SchoolShift } from '../../common/constants.js';
 
 const router = Router();
 
@@ -28,7 +29,7 @@ const createSchoolValidation = [
         .withMessage("School range is required")
         .isString()
         .withMessage("School range must be a string")
-        .isIn(Object.values(SCHOOL_RANGE))
+        .isIn(Object.values(SchoolRange))
         .withMessage("Invalid school range"),
 
     body("shift")
@@ -36,7 +37,7 @@ const createSchoolValidation = [
         .withMessage("Shift is required")
         .isString()
         .withMessage("Shift must be a string")
-        .isIn(Object.values(SCHOOL_SHIFT))
+        .isIn(Object.values(SchoolShift))
         .withMessage("Invalid school shift"),
 
     body("numberOfCampus")
@@ -50,7 +51,7 @@ const createSchoolValidation = [
         .withMessage("Selected board is required")
         .isString()
         .withMessage("Selected board must be a string")
-        .isIn(Object.values(SCHOOL_BOARD))
+        .isIn(Object.values(SchoolBoard))
         .withMessage("Invalid school board"),
   body("admin")
         .notEmpty()
