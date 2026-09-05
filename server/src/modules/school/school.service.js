@@ -2,78 +2,91 @@ import mongoose from 'mongoose';
 import { School } from './school.schema.js';
 import { User } from '../user/user.schema.js';
 import { ConflictException, NotFoundException } from '../../common/errors/HttpException.js';
-import AppError from '../../common/errors/AppError.js';
 import { hashPassword } from '../../common/utils/password.util.js';
 import generateBusinessId from '../../common/utils/businessId.util.js';
 import { UserRole } from '../../common/constants.js';
 import { sendVerificationEmail } from '../../common/utils/email-service.js';
+import { authService } from '../auth/auth.service.js';
+
 export class SchoolService {
   async create(data) {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
       const normalizedDomain = data.domain.toLowerCase().trim();
-      const existingSchool =
-        await School.findOne({
-          domain: data.domain.toLowerCase()
-        }).session(session);
+      const existingSchool = await School.findOne({
+        domain: normalizedDomain
+      }).session(session);
 
       if (existingSchool) {
-        throw new AppError(
-          "This domain is already registered",
-          409
-        );
+        throw new ConflictException("This domain is already registered");
       }
-      const businessId =
-        generateBusinessId();
+
+      const businessId = generateBusinessId();
 
       const [school] = await School.create(
         [
           {
             businessId,
             domain: normalizedDomain,
-            name:data.name,
-            legalName:data.legalName,
-            email:data.email,
-            phone:data.phone,
-            address:data.address,
-            logo:data.logo || null,
+            name: data.name,
+            legalName: data.legalName,
+            email: data.email.toLowerCase().trim(),
+            phone: data.phone,
+            address: {
+              city: data.address.city,
+              state: data.address.state,
+              country: data.address.country,
+              postalCode: data.address.postalCode,
+            },
+            logo: data.logo || data.logoUrl || null,
+            status: data.status || "active",
             establishedYear: data.establishedYear,
             schoolRange: data.schoolRange,
             shift: data.shift,
             numberOfCampus: data.numberOfCampus,
             selectedBoard: data.selectedBoard,
-            timezone: data.timezone ||"Asia/Karachi",
-            locale: data.locale ||"en-PK",
+            timezone: data.timezone || "Asia/Karachi",
+            locale: data.locale || "en-PK",
+            startTime: data.startTime,
+            endTime: data.endTime,
+            academicSession: {
+              currentYear: data.academicSession.currentYear,
+              startDate: new Date(data.academicSession.startDate),
+              endDate: new Date(data.academicSession.endDate),
+            },
+            description: data.description || null,
+            tagline: data.tagline || null,
+            isHeadCampus: data.isHeadCampus !== undefined ? data.isHeadCampus : true,
+            parentSchoolId: data.parentSchoolId || null,
+            banner: data.banner || null,
           }
         ],
-        {
-          session
-        }
+        { session }
       );
+
       const passwordHash = await hashPassword(data.admin.password);
-      [createdAdmin] =
-        await User.create(
-          [
-            {
-              schoolId:school._id,
-              email:data.admin.email.toLowerCase().trim(),
-              passwordHash,
-              role: UserRole.ADMIN,
-              firstName: data.admin.firstName,
-              lastName: data.admin.lastName,
-              status: "active",
-              emailVerified: false
-            }
-          ],
+      const [createdAdmin] = await User.create(
+        [
           {
-            session
+            schoolId: school._id,
+            email: data.admin.email.toLowerCase().trim(),
+            passwordHash,
+            role: UserRole.ADMIN,
+            firstName: data.admin.firstName,
+            lastName: data.admin.lastName,
+            isActive: true,
+            emailVerified: false,
           }
-        );
-        const verificationToken = await createEmailVerificationToken(
+        ],
+        { session }
+      );
+
+      const verificationToken = await authService.createEmailVerificationToken(
         createdAdmin._id,
         session
-        );
+      );
+
       await session.commitTransaction();
 
       try {
@@ -83,7 +96,6 @@ export class SchoolService {
           verificationToken,
         });
       } catch (emailError) {
-        // Log this internally and provide a resend-verification flow.
         console.error("Verification email failed:", emailError);
       }
 
@@ -93,8 +105,26 @@ export class SchoolService {
           businessId: school.businessId,
           domain: school.domain,
           name: school.name,
+          legalName: school.legalName,
+          email: school.email,
+          phone: school.phone,
+          address: school.address,
+          establishedYear: school.establishedYear,
+          schoolRange: school.schoolRange,
+          shift: school.shift,
+          numberOfCampus: school.numberOfCampus,
+          selectedBoard: school.selectedBoard,
+          timezone: school.timezone,
+          locale: school.locale,
+          startTime: school.startTime,
+          endTime: school.endTime,
+          academicSession: school.academicSession,
+          description: school.description,
+          tagline: school.tagline,
+          isHeadCampus: school.isHeadCampus,
+          parentSchoolId: school.parentSchoolId,
+          banner: school.banner,
         },
-
         admin: {
           id: createdAdmin._id,
           email: createdAdmin.email,
@@ -109,6 +139,7 @@ export class SchoolService {
       await session.endSession();
     }
   }
+
   async findAll() {
     const schools = await School.find({ isActive: true });
     return schools.map((school) => school.toObject());
