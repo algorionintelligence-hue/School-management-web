@@ -22,6 +22,46 @@ export class AuthController {
       next(error);
     }
   }
+  async verifyEmail(req, res, next) {
+  try {
+    const result = await authService.verifyEmail(req.query.token);
+
+    return res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+  async resendVerificationEmail(req, res, next) {
+    try {
+      const { email } = req.body;
+
+      if (!email || typeof email !== "string") {
+        throw new AppError("Email is required", 400);
+      }
+      const message = await authService.resendVerificationEmail(email);
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        message,
+      });
+
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resetPassword(req, res, next) {
+    const { token, newPassword } = req.body;
+    const result = await authService.resetPassword(token, newPassword);
+    return res.status(200).json({
+      success: true,
+      message: "Password has been reset successfully",
+      data: result,
+    });
+  }
 }
 
 export const authController = new AuthController();

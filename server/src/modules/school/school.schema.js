@@ -127,6 +127,59 @@ const schoolSchema = new mongoose.Schema(
             default: "en-PK",
             trim: true,
         },
+        startTime: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        endTime: {
+            type: String,
+            required: true,
+            trim: true, 
+        },
+        academicSession: {
+            currentYear: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+            startDate: {
+                type: Date,
+                required: true,
+            },
+            endDate: {
+                type: Date,
+                required: true,
+            },
+        },
+        //optional metadata
+        description: {
+        type: String,
+        trim: true,
+        maxlength: 1000,
+        },
+
+        tagline: {
+        type: String,
+        trim: true,
+        maxlength: 150,
+        },
+        isHeadCampus: {
+        type: Boolean,
+        default: true,
+        index: true,
+        },
+        parentSchoolId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'School',
+        default: null,
+        index: true,
+        },
+        banner: {
+        type: String,
+        trim: true,
+        default: null,
+        },
     },
     {
         timestamps: true,

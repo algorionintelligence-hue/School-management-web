@@ -6,9 +6,9 @@ import AppError from '../../common/errors/AppError.js';
 import { hashPassword } from '../../common/utils/password.util.js';
 import generateBusinessId from '../../common/utils/businessId.util.js';
 import { UserRole } from '../../common/constants.js';
+import { sendVerificationEmail } from '../../common/utils/email-service.js';
 export class SchoolService {
   async create(data) {
-
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -32,114 +32,80 @@ export class SchoolService {
           {
             businessId,
             domain: normalizedDomain,
-            name:
-              data.name,
-
-            legalName:
-              data.legalName,
-
-            email:
-              data.email,
-
-            phone:
-              data.phone,
-
-            address:
-              data.address,
-
-            logo:
-              data.logo || null,
+            name:data.name,
+            legalName:data.legalName,
+            email:data.email,
+            phone:data.phone,
+            address:data.address,
+            logo:data.logo || null,
             establishedYear: data.establishedYear,
-
             schoolRange: data.schoolRange,
-
             shift: data.shift,
-
             numberOfCampus: data.numberOfCampus,
-
             selectedBoard: data.selectedBoard,
-
-            timezone:
-              data.timezone ||
-              "Asia/Karachi",
-
-            locale:
-              data.locale ||
-              "en-PK",
+            timezone: data.timezone ||"Asia/Karachi",
+            locale: data.locale ||"en-PK",
           }
         ],
         {
           session
         }
       );
-      const passwordHash =
-        await hashPassword(
-          data.admin.password
-        );
-      const [adminUser] =
+      const passwordHash = await hashPassword(data.admin.password);
+      [createdAdmin] =
         await User.create(
           [
             {
-              schoolId:
-                school._id,
-
-              email:
-                data.admin.email
-                  .toLowerCase()
-                  .trim(),
-
+              schoolId:school._id,
+              email:data.admin.email.toLowerCase().trim(),
               passwordHash,
-
               role: UserRole.ADMIN,
-
-              firstName:
-                data.admin.firstName,
-
-              lastName:
-                data.admin.lastName,
-
-              status:
-                "active",
-
-              emailVerified:
-                false
+              firstName: data.admin.firstName,
+              lastName: data.admin.lastName,
+              status: "active",
+              emailVerified: false
             }
           ],
           {
             session
           }
         );
-
+        const verificationToken = await createEmailVerificationToken(
+        createdAdmin._id,
+        session
+        );
       await session.commitTransaction();
+
+      try {
+        await sendVerificationEmail({
+          to: createdAdmin.email,
+          firstName: createdAdmin.firstName,
+          verificationToken,
+        });
+      } catch (emailError) {
+        // Log this internally and provide a resend-verification flow.
+        console.error("Verification email failed:", emailError);
+      }
 
       return {
         school: {
           id: school._id,
-          businessId:
-            school.businessId,
-          domain:
-            school.domain,
-          name:
-            school.name
+          businessId: school.businessId,
+          domain: school.domain,
+          name: school.name,
         },
 
         admin: {
-          id: adminUser._id,
-          email:
-            adminUser.email,
-          role:
-            adminUser.role
+          id: createdAdmin._id,
+          email: createdAdmin.email,
+          role: createdAdmin.role,
+          emailVerified: createdAdmin.emailVerified,
         }
       };
-
     } catch (error) {
-
       await session.abortTransaction();
-
       throw error;
-
     } finally {
-
       await session.endSession();
     }
   }
