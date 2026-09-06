@@ -48,7 +48,7 @@ const updateStudentValidation = [
 
 router.use(authMiddleware);
 router.post('/', createStudentValidation, validateMiddleware, studentController.create);
-router.get('/', studentController.findAll);
+router.get('/', validateMiddleware, studentController.findAll);
 router.get('/:id', studentController.findOne);
 router.patch('/:id', updateStudentValidation, validateMiddleware, studentController.update);
 router.delete('/:id', studentController.remove);

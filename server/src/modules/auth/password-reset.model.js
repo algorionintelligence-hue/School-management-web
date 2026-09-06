@@ -25,11 +25,6 @@ const passwordResetTokenSchema = new mongoose.Schema(
   }
 );
 
-// MongoDB automatically removes expired documents.
-passwordResetTokenSchema.index(
-  { expiresAt: 1 },
-  { expireAfterSeconds: 0 }
-);
 
 export const PasswordResetToken = mongoose.model(
   "PasswordResetToken",
