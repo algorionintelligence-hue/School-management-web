@@ -57,7 +57,7 @@ If you did not create this account, you can safely ignore this email.
     </p>`,
   });
 
-  return info;
+  return {info, verificationUrl};
 }
 
 export async function sendPasswordResetEmail({
@@ -114,4 +114,4 @@ If you did not request a password reset, please ignore this email.
   });
 
   return info;
-}
+}

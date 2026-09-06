@@ -29,10 +29,6 @@ const emailVerificationTokenSchema = new mongoose.Schema(
 );
 
 // MongoDB automatically removes expired documents.
-emailVerificationTokenSchema.index(
-  { expiresAt: 1 },
-  { expireAfterSeconds: 0 }
-);
 
 export const EmailVerificationToken = mongoose.model(
   "EmailVerificationToken",

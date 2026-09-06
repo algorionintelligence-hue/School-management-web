@@ -5,6 +5,7 @@ import { ConflictException, NotFoundException } from '../../common/errors/HttpEx
 import { hashPassword } from '../../common/utils/password.util.js';
 
 export class StudentService {
+
   async create(schoolId, domain, createStudentDto) {
     const { ObjectId } = mongoose.Types;
 
@@ -17,6 +18,9 @@ export class StudentService {
     if (existingUser) {
       throw new ConflictException('Student with this email already exists in this school');
     }
+
+    // Auto-generate system roll number and verify it is unique and not already assigned this function in utils and also i asked you to only if the rollnumber doesn't
+    const rollNumber = await this.generateUniqueRollNumber(schoolId);
 
     // Hash password
     const passwordHash = await hashPassword(createStudentDto.password);
@@ -41,9 +45,9 @@ export class StudentService {
     const createdStudent = await Student.create({
       userId: createdUser._id,
       schoolId: new ObjectId(schoolId),
+      rollNumber,
       gradeLevel: createStudentDto.gradeLevel,
       section: createStudentDto.section,
-      rollNumber: createStudentDto.rollNumber,
       guardianName: createStudentDto.guardianName,
       guardianPhone: createStudentDto.guardianPhone,
       guardianEmail: createStudentDto.guardianEmail,

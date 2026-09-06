@@ -1,5 +1,5 @@
-// models/StudentProfile.ts
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { GradeLevel, Section, BloodGroup } from '../../common/constants.js';
 
 const studentProfileSchema = new Schema(
   {
@@ -15,16 +15,25 @@ const studentProfileSchema = new Schema(
       required: true,
       index: true,
     },
-    gradeLevel: { type: String, trim: true },
-    section: { type: String, trim: true },
+    rollNumber: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    gradeLevel: { type: String, enum: Object.values(GradeLevel), trim: true },
+    section: { type: String, enum: Object.values(Section), trim: true },
     guardianName: { type: String, trim: true },
     guardianPhone: { type: String, trim: true },
     guardianEmail: { type: String, lowercase: true, trim: true },
+    guardianRelation: { type: String, trim: true },
     admissionDate: { type: Date },
-    bloodGroup: { type: String, trim: true },
+    bloodGroup: { type: String, enum: Object.values(BloodGroup), trim: true },
     medicalNotes: { type: String, trim: true },
+    isAlumni: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
+
+studentProfileSchema.index({ schoolId: 1, rollNumber: 1 }, { unique: true });
 
 export const Student = mongoose.model('Student', studentProfileSchema);

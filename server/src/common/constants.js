@@ -75,6 +75,44 @@ export const SchoolBoard = Object.freeze({
     PRIVATE: "Private Board",
 });
 
+export const GradeLevel = Object.freeze({
+  NURSERY: 'Nursery',
+  LKG: 'LKG',
+  UKG: 'UKG',
+  GRADE_1: '1st',
+  GRADE_2: '2nd',
+  GRADE_3: '3rd',
+  GRADE_4: '4th',
+  GRADE_5: '5th',
+  GRADE_6: '6th',
+  GRADE_7: '7th',
+  GRADE_8: '8th',
+  GRADE_9: '9th',
+  GRADE_10: '10th',
+  GRADE_11: '11th',
+  GRADE_12: '12th',
+});
+
+export const Section = Object.freeze({
+  A: 'A',
+  B: 'B',
+  C: 'C',
+  D: 'D',
+  E: 'E',
+  F: 'F',
+});
+
+export const BloodGroup = Object.freeze({
+  A_POSITIVE: 'A+',
+  A_NEGATIVE: 'A-',
+  B_POSITIVE: 'B+',
+  B_NEGATIVE: 'B-',
+  AB_POSITIVE: 'AB+',
+  AB_NEGATIVE: 'AB-',
+  O_POSITIVE: 'O+',
+  O_NEGATIVE: 'O-',
+});
+
 // Helper function to get all enum values
 export const getEnumValues = (enumObj) => {
   return Object.values(enumObj);
