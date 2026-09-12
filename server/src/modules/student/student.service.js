@@ -65,8 +65,8 @@ export class StudentService {
     const { ObjectId } = mongoose.Types;
     const students = await Student.find({
       schoolId: new ObjectId(schoolId),
-      isAlumni: false,
-    }).populate('userId', 'firstName lastName email studentId');
+      isAlumni: { $ne: true },
+    }).populate('userId', 'firstName lastName email phone gender dateOfBirth isActive');
 
     return students.map((student) => student.toObject());
   }

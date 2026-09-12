@@ -57,22 +57,22 @@ export const SchoolStatus = {
 };
 
 export const SchoolRange = Object.freeze({
-    PRIMARY_TO_SECONDARY: "1-10",
-    HIGHER_SECONDARY: "11-12",
+  PRIMARY_TO_SECONDARY: "1-10",
+  HIGHER_SECONDARY: "11-12",
 });
 
 export const SchoolShift = Object.freeze({
-    MORNING: "morning",
-    EVENING: "evening",
+  MORNING: "morning",
+  EVENING: "evening",
 });
 
 export const SchoolBoard = Object.freeze({
-    FEDERAL: "Federal Board",
-    SINDH: "Sindh Board",
-    PUNJAB: "Punjab Board",
-    BALOCHISTAN: "Balochistan Board",
-    KHYBER_PAKHTUNKHWA: "Khyber Pakhtunkhwa Board",
-    PRIVATE: "Private Board",
+  FEDERAL: "Federal Board",
+  SINDH: "Sindh Board",
+  PUNJAB: "Punjab Board",
+  BALOCHISTAN: "Balochistan Board",
+  KHYBER_PAKHTUNKHWA: "Khyber Pakhtunkhwa Board",
+  PRIVATE: "Private Board",
 });
 
 export const GradeLevel = Object.freeze({
@@ -112,6 +112,48 @@ export const BloodGroup = Object.freeze({
   O_POSITIVE: 'O+',
   O_NEGATIVE: 'O-',
 });
+
+export const ClassStream = {
+  SCIENCE: "Science",
+  ARTS: "Arts",
+  COMMERCE: "Commerce",
+};
+
+
+// src/modules/subjects/subject.constants.js
+
+export const SubjectType = {
+  COMPULSORY: "Core",
+  ELECTIVE: "Elective",
+};
+
+export const SubjectCategory = {
+  LANGUAGE: "Language",
+  SCIENCE: "Science",
+  MATHEMATICS: "Mathematics",
+  SOCIAL_SCIENCE: "SocialScience",
+  ARTS: "Arts",
+  PHYSICAL_EDUCATION: "PhysicalEducation",
+  VOCATIONAL: "Vocational",
+  OTHER: "Other",
+};
+
+export const TeacherSubjectRole = {
+  PRIMARY: "primary",
+  CO_TEACHER: "co_teacher",
+};
+
+export const Status = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  SUSPENDED: 'archived',
+};
+
+export const StreamCode = {
+  SCIENCE: "SCI",
+  COMMERCE: "COM",
+  ARTS: "ART",
+};
 
 // Helper function to get all enum values
 export const getEnumValues = (enumObj) => {

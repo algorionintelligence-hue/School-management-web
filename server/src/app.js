@@ -7,6 +7,10 @@ import schoolRoutes from './modules/school/school.routes.js';
 import teacherRoutes from './modules/teacher/teacher.routes.js';
 import studentRoutes from './modules/student/student.routes.js';
 import authRoutes from './modules/auth/auth.routes.js';
+import classRoutes from './modules/academic/class/class.routes.js';
+import streamRoutes from './modules/academic/stream/stream.routes.js';
+import subjectRoutes from './modules/academic/subject/subject.routes.js';
+import teacherSubjectRoutes from './modules/academic/subject/teacher-subject.routes.js';
 
 const app = express();
 
@@ -20,6 +24,10 @@ app.use('/api/v1/schools', schoolRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/teachers', teacherRoutes);
 app.use('/api/v1/students', studentRoutes);
+app.use('/api/v1/classes', classRoutes);
+app.use('/api/v1/streams', streamRoutes);
+app.use('/api/v1/subjects', subjectRoutes);
+app.use('/api/v1/teacher-subjects', teacherSubjectRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

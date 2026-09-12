@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { studentController } from './student.controller.js';
 import { authMiddleware } from '../../common/middleware/auth.middleware.js';
+import { requireRoles } from '../../common/middleware/role.middleware.js';
 import { validateMiddleware } from '../../common/middleware/validation.middleware.js';
 import { body } from 'express-validator';
-import { GradeLevel, Section, BloodGroup, Gender, GuardianRelation } from '../../common/constants.js';
+import { GradeLevel, Section, BloodGroup, Gender, GuardianRelation, UserRole } from '../../common/constants.js';
 
 const router = Router();
 
@@ -47,10 +48,20 @@ const updateStudentValidation = [
 ];
 
 router.use(authMiddleware);
-router.post('/', createStudentValidation, validateMiddleware, studentController.create);
-router.get('/', validateMiddleware, studentController.findAll);
-router.get('/:id', studentController.findOne);
-router.patch('/:id', updateStudentValidation, validateMiddleware, studentController.update);
-router.delete('/:id', studentController.remove);
+
+// Only ADMIN can create students
+router.post('/', requireRoles(UserRole.ADMIN), createStudentValidation, validateMiddleware, studentController.create);
+
+// ADMIN and TEACHER can view all students list
+router.get('/', requireRoles(UserRole.ADMIN, UserRole.TEACHER), studentController.findAll);
+
+// ADMIN and TEACHER can view any student; STUDENT can view only their own profile
+router.get('/:id', requireRoles(UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT), studentController.findOne);
+
+// Only ADMIN can update students
+router.patch('/:id', requireRoles(UserRole.ADMIN), updateStudentValidation, validateMiddleware, studentController.update);
+
+// Only ADMIN can delete students
+router.delete('/:id', requireRoles(UserRole.ADMIN), studentController.remove);
 
 export default router;
