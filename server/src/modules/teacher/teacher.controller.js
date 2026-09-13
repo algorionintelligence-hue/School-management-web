@@ -55,6 +55,20 @@ export class TeacherController {
     }
   }
 
+  async getDropdown(req, res, next) {
+    try {
+      const schoolId = await getSchoolId(req);
+      const teachers = await teacherService.getDropdown(schoolId);
+
+      res.status(StatusCodes.OK).json({
+        status: 'success',
+        data: teachers,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async findOne(req, res, next) {
     try {
       const schoolId = await getSchoolId(req);

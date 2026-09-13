@@ -12,17 +12,18 @@ export class ClassService {
   async create(schoolId, createClassDto) {
     const { ObjectId } = mongoose.Types;
 
-    // Check for duplicate class in the same school + session + name + section
+    // Check for duplicate class (matches the unique compound index in the schema)
     const existing = await Class.findOne({
       schoolId: new ObjectId(schoolId),
       academicSession: createClassDto.academicSession,
-      name: createClassDto.name,
-      section: createClassDto.section ?? null,
+      level: createClassDto.level,
+      streamId: new ObjectId(createClassDto.streamId),
+      section: createClassDto.section,
     });
 
     if (existing) {
       throw new ConflictException(
-        'A class with this name and section already exists for the given academic session'
+        'A class with this level, stream, and section already exists for the given academic session'
       );
     }
 

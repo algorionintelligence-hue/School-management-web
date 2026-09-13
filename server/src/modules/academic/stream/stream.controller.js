@@ -71,6 +71,24 @@ export class StreamController {
   }
 
   /**
+   * GET /api/v1/streams/dropdown
+   * All authenticated users — get stream _id and name for dropdowns.
+   */
+  async getDropdown(req, res, next) {
+    try {
+      const schoolId = await getSchoolId(req);
+      const streams = await streamService.getDropdown(schoolId);
+
+      res.status(StatusCodes.OK).json({
+        status: 'success',
+        data: streams,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * GET /api/v1/streams/:id
    * All authenticated users — view a single stream.
    */

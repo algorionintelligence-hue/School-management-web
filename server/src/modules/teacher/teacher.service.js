@@ -60,6 +60,24 @@ export class TeacherService {
     return teachers.map((teacher) => teacher.toObject());
   }
 
+  async getDropdown(schoolId) {
+    const { ObjectId } = mongoose.Types;
+    const teachers = await Teacher.find({ schoolId: new ObjectId(schoolId) })
+      .populate('userId', 'firstName middleName lastName isActive');
+
+    return teachers
+      .filter((t) => t.userId && t.userId.isActive)
+      .map((t) => {
+        const user = t.userId;
+        const name = `${user.firstName || ''} ${user.middleName ? user.middleName + ' ' : ''}${user.lastName || ''}`.trim();
+        return {
+          _id: user._id, // We return the User's _id because class and subject assignments expect the User reference
+          teacherProfileId: t._id,
+          name: name || 'Unknown Teacher',
+        };
+      });
+  }
+
   async findOne(schoolId, id) {
     const { ObjectId } = mongoose.Types;
     const teacher = await Teacher.findOne({

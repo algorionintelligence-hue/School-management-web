@@ -27,6 +27,9 @@ router.post(
 // All authenticated users can list streams
 router.get('/', streamController.findAll);
 
+// All authenticated users can get streams dropdown
+router.get('/dropdown', streamController.getDropdown);
+
 // All authenticated users can view a single stream
 router.get('/:id', streamController.findOne);
 

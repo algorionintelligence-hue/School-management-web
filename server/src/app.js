@@ -24,7 +24,7 @@ app.use('/api/v1/schools', schoolRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/teachers', teacherRoutes);
 app.use('/api/v1/students', studentRoutes);
-app.use('/api/v1/classes', classRoutes);
+app.use('/api/v1/class', classRoutes);
 app.use('/api/v1/streams', streamRoutes);
 app.use('/api/v1/subjects', subjectRoutes);
 app.use('/api/v1/teacher-subjects', teacherSubjectRoutes);

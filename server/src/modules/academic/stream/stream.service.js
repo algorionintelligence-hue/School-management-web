@@ -54,6 +54,19 @@ export class StreamService {
     return streams.map((s) => s.toObject());
   }
 
+  async getDropdown(schoolId) {
+    const { ObjectId } = mongoose.Types;
+
+    const streams = await Stream.find({ 
+      schoolId: new ObjectId(schoolId),
+      status: 'active'
+    })
+      .select('_id name')
+      .sort({ name: 1 });
+
+    return streams.map((s) => s.toObject());
+  }
+
   /**
    * Get a single stream by id, scoped to schoolId.
    */
