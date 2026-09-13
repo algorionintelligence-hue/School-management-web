@@ -29,12 +29,6 @@ const teacherSubjectSchema = new mongoose.Schema(
       ref: "Subject",
       required: true,
     },
-
-    role: {
-      type: String,
-      enum: Object.values(TeacherSubjectRole),
-      default: TeacherSubjectRole.PRIMARY,
-    },
   },
   {
     timestamps: true,

@@ -2,9 +2,7 @@
 // express-validator rules for TeacherSubject assign and query requests.
 
 import { body, query } from 'express-validator';
-import { TeacherSubjectRole } from '../../../../common/constants.js';
 
-const roleValues = Object.values(TeacherSubjectRole);
 
 // ─── Assign Validation ────────────────────────────────────────────────────────
 
@@ -30,12 +28,7 @@ export const assignTeacherValidation = [
     .matches(/^\d{4}-\d{2,4}$/)
     .withMessage(
       'academicSession must be in the format YYYY-YY or YYYY-YYYY (e.g. 2024-25)'
-    ),
-
-  body('role')
-    .optional()
-    .isIn(roleValues)
-    .withMessage(`role must be one of: ${roleValues.join(', ')}`),
+    )
 ];
 
 // ─── List Query Validation ────────────────────────────────────────────────────
@@ -56,10 +49,5 @@ export const listTeacherSubjectQueryValidation = [
     .matches(/^\d{4}-\d{2,4}$/)
     .withMessage(
       'academicSession must be in the format YYYY-YY or YYYY-YYYY (e.g. 2024-25)'
-    ),
-
-  query('role')
-    .optional()
-    .isIn(roleValues)
-    .withMessage(`role must be one of: ${roleValues.join(', ')}`),
+    )
 ];

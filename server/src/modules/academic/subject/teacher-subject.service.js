@@ -54,8 +54,7 @@ export class TeacherSubjectService {
       schoolId: schoolObjId,
       academicSession: assignDto.academicSession,
       teacherId: new ObjectId(assignDto.teacherId),
-      subjectId: new ObjectId(assignDto.subjectId),
-      role: assignDto.role ?? TeacherSubjectRole.PRIMARY,
+      subjectId: new ObjectId(assignDto.subjectId)
     });
 
     if (duplicate) {
@@ -69,7 +68,6 @@ export class TeacherSubjectService {
       academicSession: assignDto.academicSession,
       teacherId: new ObjectId(assignDto.teacherId),
       subjectId: new ObjectId(assignDto.subjectId),
-      role: assignDto.role ?? TeacherSubjectRole.PRIMARY,
     });
 
     return (
@@ -95,7 +93,6 @@ export class TeacherSubjectService {
     if (filters.subjectId)       query.subjectId = new ObjectId(filters.subjectId);
     if (filters.teacherId)       query.teacherId = new ObjectId(filters.teacherId);
     if (filters.academicSession) query.academicSession = filters.academicSession;
-    if (filters.role)            query.role = filters.role;
 
     const assignments = await TeacherSubject.find(query)
       .populate('teacherId', 'firstName lastName email')
