@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { ClassSubject } from './schemas/class-subject.schema.js';
-import { Class } from './class.schema.js';
+import { Class } from './schemas/class.schema.js';
 import { Subject } from '../subject/schemas/subject.schema.js';
 import { User } from '../../user/user.schema.js';
 import { UserRole } from '../../../common/constants.js';

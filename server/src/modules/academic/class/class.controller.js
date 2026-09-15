@@ -2,7 +2,7 @@
 
 import { StatusCodes } from 'http-status-codes';
 import { classService } from './class.service.js';
-import { User } from '../../../modules/user/user.schema.js';
+import { User } from '../../user/user.schema.js';
 import { UnauthorizedException } from '../../../common/errors/HttpException.js';
 
 /**

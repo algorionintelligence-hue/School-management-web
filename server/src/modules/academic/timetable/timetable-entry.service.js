@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { TimetableEntry } from './schemas/timetable-entry.schema.js';
-import { Class } from '../class/class.schema.js';
+import { Class } from '../class/schemas/class.schema.js';
 import { ClassSubject } from '../class/schemas/class-subject.schema.js';
 import { TeacherSubject } from '../subject/schemas/teacher-subject.schema.js';
 import { User } from '../../user/user.schema.js';
