@@ -1,7 +1,7 @@
 // src/modules/academic/class/class.service.js
 
 import mongoose from 'mongoose';
-import { Class } from './class.schema.js';
+import { Class } from './schemas/class.schema.js';
 import { ConflictException, NotFoundException } from '../../../common/errors/HttpException.js';
 
 export class ClassService {
@@ -12,18 +12,17 @@ export class ClassService {
   async create(schoolId, createClassDto) {
     const { ObjectId } = mongoose.Types;
 
-    // Check for duplicate class (matches the unique compound index in the schema)
+    // Check for duplicate class in the same school + session + name + section
     const existing = await Class.findOne({
       schoolId: new ObjectId(schoolId),
       academicSession: createClassDto.academicSession,
-      level: createClassDto.level,
-      streamId: new ObjectId(createClassDto.streamId),
-      section: createClassDto.section,
+      name: createClassDto.name,
+      section: createClassDto.section ?? null,
     });
 
     if (existing) {
       throw new ConflictException(
-        'A class with this level, stream, and section already exists for the given academic session'
+        'A class with this name and section already exists for the given academic session'
       );
     }
 

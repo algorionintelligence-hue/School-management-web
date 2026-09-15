@@ -1,7 +1,7 @@
 // src/modules/classes/class.model.js
 
 import mongoose from "mongoose";
-import { Section, Status } from "../../../common/constants.js";
+import { Section, Status } from "../../../../common/constants.js";
 
 const classSchema = new mongoose.Schema(
   {

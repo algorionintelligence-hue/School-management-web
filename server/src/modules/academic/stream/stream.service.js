@@ -2,7 +2,7 @@
 
 import mongoose from 'mongoose';
 import { Stream } from './stream.schema.js';
-import { Subject } from '../subject/subject.schema.js';
+import { Subject } from '../subject/schemas/subject.schema.js';
 import {
   BadRequestException,
   ConflictException,

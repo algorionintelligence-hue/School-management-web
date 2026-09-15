@@ -1,7 +1,7 @@
 // src/modules/academic/subject/teacher-subject.schema.js
 
 import mongoose from "mongoose";
-import { TeacherSubjectRole } from "../../../common/constants.js";
+import { TeacherSubjectRole } from "../../../../common/constants.js";
 
 const teacherSubjectSchema = new mongoose.Schema(
   {

@@ -155,6 +155,32 @@ export const StreamCode = {
   ARTS: "ART",
 };
 
+export const TimetableStatus = {
+  DRAFT: "DRAFT",
+  PUBLISHED: "PUBLISHED",
+  ARCHIVED: "ARCHIVED"
+};
+
+export const TimetableEntryType = {
+  SUBJECT: "SUBJECT",
+  LAB: "LAB",
+  ACTIVITY: "ACTIVITY",
+  ASSEMBLY: "ASSEMBLY",
+  HOMEROOM: "HOMEROOM",
+  LIBRARY: "LIBRARY",
+  EXAM: "EXAM",
+  OTHER: "OTHER",
+};
+
+export const TimetableDay = {
+  MONDAY: "MONDAY",
+  TUESDAY: "TUESDAY",
+  WEDNESDAY: "WEDNESDAY",
+  THURSDAY: "THURSDAY",
+  FRIDAY: "FRIDAY",
+  SATURDAY: "SATURDAY",
+  SUNDAY: "SUNDAY",
+};
 // Helper function to get all enum values
 export const getEnumValues = (enumObj) => {
   return Object.values(enumObj);

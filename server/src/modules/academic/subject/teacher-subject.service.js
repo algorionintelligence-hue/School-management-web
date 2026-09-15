@@ -1,8 +1,8 @@
 // src/modules/academic/subject/teacher-subject.service.js
 
 import mongoose from 'mongoose';
-import { TeacherSubject } from './teacher-subject.schema.js';
-import { Subject } from './subject.schema.js';
+import { TeacherSubject } from './schemas/teacher-subject.schema.js';
+import { Subject } from './schemas/subject.schema.js';
 import { User } from '../../user/user.schema.js';
 import { TeacherSubjectRole, UserRole } from '../../../common/constants.js';
 import {

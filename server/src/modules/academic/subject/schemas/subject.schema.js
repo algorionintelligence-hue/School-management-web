@@ -1,7 +1,7 @@
 // src/modules/subjects/subject.model.js
 
 import mongoose from "mongoose";
-import { SubjectCategory, SubjectType, Status } from "../../../common/constants.js";
+import { SubjectCategory, SubjectType, Status } from "../../../../common/constants.js";
 
 const subjectSchema = new mongoose.Schema(
   {

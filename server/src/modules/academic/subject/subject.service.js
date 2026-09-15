@@ -1,9 +1,9 @@
 // src/modules/academic/subject/subject.service.js
 
 import mongoose from 'mongoose';
-import { Subject } from './subject.schema.js';
+import { Subject } from './schemas/subject.schema.js';
 import { Stream } from '../stream/stream.schema.js';
-import { TeacherSubject } from './teacher-subject.schema.js';
+import { TeacherSubject } from './schemas/teacher-subject.schema.js';
 import { createSubjectCodePrefix } from '../../../common/utils/subjectCode.util.js';
 import {
   BadRequestException,
