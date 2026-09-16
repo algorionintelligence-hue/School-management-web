@@ -58,6 +58,117 @@ export class ClassService {
   }
 
   /**
+   * Get only _id and name (plus level, section, academicSession) of active classes for dropdowns.
+   */
+  async getDropdown(schoolId) {
+    const { ObjectId } = mongoose.Types;
+
+    const classes = await Class.find({
+      schoolId: new ObjectId(schoolId),
+      status: 'active',
+    })
+      .select('_id name level section academicSession')
+      .sort({ level: 1, section: 1 });
+
+    return classes.map((c) => c.toObject());
+  }
+
+  /**
+   * Get class-section combined dropdown list (label: "Class 10-A", classId: "_id") for single select dropdowns.
+   */
+  async getClassSectionDropdown(schoolId, academicSession = null) {
+    const { ObjectId } = mongoose.Types;
+
+    const query = {
+      schoolId: new ObjectId(schoolId),
+      status: 'active',
+    };
+    if (academicSession) {
+      query.academicSession = academicSession.trim();
+    }
+
+    const classes = await Class.find(query)
+      .select('_id name level section academicSession')
+      .sort({ level: 1, section: 1 });
+
+    return classes.map((c) => {
+      const label = c.section ? `${c.name}-${c.section}` : c.name;
+      return {
+        classId: c._id,
+        _id: c._id,
+        label,
+        name: c.name,
+        section: c.section,
+        level: c.level,
+        academicSession: c.academicSession,
+      };
+    });
+  }
+
+  /**
+   * Get distinct class names for a school.
+   */
+  async getClassNames(schoolId, academicSession) {
+    const { ObjectId } = mongoose.Types;
+    const query = { schoolId: new ObjectId(schoolId), status: 'active' };
+    if (academicSession) query.academicSession = academicSession.trim();
+
+    const names = await Class.distinct('name', query);
+    return names.sort();
+  }
+
+  /**
+   * Get available sections and their classIds for a specific class name.
+   */
+  async getSectionsByName(schoolId, { name, academicSession }) {
+    const { ObjectId } = mongoose.Types;
+    const query = {
+      schoolId: new ObjectId(schoolId),
+      name: name.trim(),
+      status: 'active',
+    };
+    if (academicSession) query.academicSession = academicSession.trim();
+
+    const classes = await Class.find(query)
+      .select('_id section level academicSession')
+      .sort({ section: 1 });
+
+    return classes.map((c) => ({
+      classId: c._id,
+      _id: c._id,
+      section: c.section,
+      level: c.level,
+      academicSession: c.academicSession,
+    }));
+  }
+
+  /**
+   * Find a unique class by name, section, and optional academicSession.
+   */
+  async findByNameAndSection(schoolId, { name, section, academicSession }) {
+    const { ObjectId } = mongoose.Types;
+    const query = {
+      schoolId: new ObjectId(schoolId),
+      name: name.trim(),
+      section: section.trim().toUpperCase(),
+    };
+    if (academicSession) {
+      query.academicSession = academicSession.trim();
+    }
+
+    const classDoc = await Class.findOne(query).select('_id name level section academicSession');
+    if (!classDoc) {
+      throw new NotFoundException(`Class '${name}' with Section '${section}' not found`);
+    }
+
+    const obj = classDoc.toObject();
+    return {
+      classId: obj._id,
+      ...obj,
+    };
+  }
+
+  /**
    * Get a single class by id, scoped to schoolId.
    */
   async findOne(schoolId, id) {

@@ -11,8 +11,8 @@ import classRoutes from './modules/academic/class/class.routes.js';
 import classSubjectRoutes from './modules/academic/class/class-subject.routes.js';
 import streamRoutes from './modules/academic/stream/stream.routes.js';
 import subjectRoutes from './modules/academic/subject/subject.routes.js';
-import teacherSubjectRoutes from './modules/academic/subject/teacher-subject.routes.js';
 import timetableRoutes from './modules/academic/timetable/timetable-entry.routes.js';
+import syllabusRoutes from './modules/academic/syllabus/syllabus.routes.js';
 
 const app = express();
 
@@ -30,8 +30,8 @@ app.use('/api/v1/class', classRoutes);
 app.use('/api/v1/class-subjects', classSubjectRoutes);
 app.use('/api/v1/streams', streamRoutes);
 app.use('/api/v1/subjects', subjectRoutes);
-app.use('/api/v1/teacher-subjects', teacherSubjectRoutes);
 app.use('/api/v1/timetables', timetableRoutes);
+app.use('/api/v1/syllabuses', syllabusRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

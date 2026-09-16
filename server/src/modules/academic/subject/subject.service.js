@@ -3,7 +3,7 @@
 import mongoose from 'mongoose';
 import { Subject } from './schemas/subject.schema.js';
 import { Stream } from '../stream/stream.schema.js';
-import { TeacherSubject } from './schemas/teacher-subject.schema.js';
+import { ClassSubject } from '../class/schemas/class-subject.schema.js';
 import { createSubjectCodePrefix } from '../../../common/utils/subjectCode.util.js';
 import {
   BadRequestException,
@@ -204,7 +204,7 @@ export class SubjectService {
 
   /**
    * Hard-delete a subject by id, scoped to schoolId.
-   * Guards: refuses deletion if TeacherSubject records still reference it.
+   * Guards: refuses deletion if ClassSubject records still reference it.
    */
   async remove(schoolId, id) {
     const { ObjectId } = mongoose.Types;
@@ -218,14 +218,15 @@ export class SubjectService {
       throw new NotFoundException('Subject not found');
     }
 
-    const assignmentCount = await TeacherSubject.countDocuments({
+    const assignmentCount = await ClassSubject.countDocuments({
       subjectId: new ObjectId(id),
+      schoolId: new ObjectId(schoolId),
     });
 
     if (assignmentCount > 0) {
       throw new ConflictException(
-        `Cannot delete this subject — ${assignmentCount} teacher assignment(s) still reference it. ` +
-          'Remove those assignments first.'
+        `Cannot delete this subject — ${assignmentCount} class assignment(s) still reference it. ` +
+          'Remove those class assignments first.'
       );
     }
 

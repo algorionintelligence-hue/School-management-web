@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import { TimetableEntry } from './schemas/timetable-entry.schema.js';
 import { Class } from '../class/schemas/class.schema.js';
 import { ClassSubject } from '../class/schemas/class-subject.schema.js';
-import { TeacherSubject } from '../subject/schemas/teacher-subject.schema.js';
 import { User } from '../../user/user.schema.js';
 import { UserRole, Status } from '../../../common/constants.js';
 import {
@@ -121,21 +120,7 @@ class TimetableEntryService {
       throw new NotFoundException('Teacher not found in this school');
     }
 
-    // 4. Validate TeacherSubject mapping (Teacher is qualified to teach this subject in this session)
-    const teacherSubjectObj = await TeacherSubject.findOne({
-      schoolId: schoolObjId,
-      teacherId: teacherObjId,
-      subjectId: classSubjectObj.subjectId,
-      academicSession: dto.academicSession,
-    });
-
-    if (!teacherSubjectObj) {
-      throw new BadRequestException(
-        'Teacher is not assigned to teach this subject in TeacherSubject for this academic session'
-      );
-    }
-
-    // 5. Check Timetable Conflicts
+    // 4. Check Timetable Conflicts
     await this.checkConflicts({
       schoolId,
       academicSession: dto.academicSession,
@@ -225,21 +210,7 @@ class TimetableEntryService {
       throw new NotFoundException('Teacher not found in this school');
     }
 
-    // 4. Validate TeacherSubject mapping
-    const teacherSubjectObj = await TeacherSubject.findOne({
-      schoolId: schoolObjId,
-      teacherId: mergedTeacherId,
-      subjectId: classSubjectObj.subjectId,
-      academicSession: mergedSession,
-    });
-
-    if (!teacherSubjectObj) {
-      throw new BadRequestException(
-        'Teacher is not assigned to teach this subject in TeacherSubject for this academic session'
-      );
-    }
-
-    // 5. Check Timetable Conflicts excluding current entry
+    // 4. Check Timetable Conflicts excluding current entry
     await this.checkConflicts({
       schoolId,
       academicSession: mergedSession,

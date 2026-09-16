@@ -27,6 +27,21 @@ router.post(
 // All authenticated users can view the list of classes
 router.get('/', classController.findAll);
 
+// All authenticated users can get _id and name for dropdown lists
+router.get('/dropdown', classController.getDropdown);
+
+// All authenticated users can get class-section dropdown formatted as "Class 10-A" with classId
+router.get('/class-section-dropdown', classController.getClassSectionDropdown);
+
+// All authenticated users can get unique class names
+router.get('/names', classController.getClassNames);
+
+// All authenticated users can get available sections and classIds by class name
+router.get('/sections', classController.getSectionsByName);
+
+// All authenticated users can lookup unique class _id by name and section
+router.get('/lookup', classController.lookupByNameAndSection);
+
 // All authenticated users can view a single class
 router.get('/:id', classController.findOne);
 
