@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import nodemailer from "nodemailer";
 
-const smtpPort = Number(process.env.SMTP_PORT || 587);
+const smtpPort = Number(process.env.SMTP_PORT || 25);
 
 export const emailTransporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || '127.0.0.1',
@@ -12,9 +12,10 @@ export const emailTransporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASS,
   } : undefined,
   tls: {
-    rejectUnauthorized: false, // Accepts self-signed TLS certificates from VPS Postfix/host
+    rejectUnauthorized: false, // Accepts self-signed TLS certificates from VPS Host / Postfix
   },
 });
+
 
 emailTransporter.verify((error, success) => {
   if (error) {
