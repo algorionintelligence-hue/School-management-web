@@ -4,7 +4,8 @@ import { schoolService } from './school.service.js';
 export class SchoolController {
   async create(req, res, next) {
     try {
-      const school = await schoolService.create(req.body);
+      const userId = req.user?.sub || req.user?.userId;
+      const school = await schoolService.create(req.body, userId);
       res.status(StatusCodes.CREATED).json({
         status: 'success',
         data: school,

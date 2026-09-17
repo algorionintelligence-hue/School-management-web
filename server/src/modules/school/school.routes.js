@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { schoolController } from './school.controller.js';
 import { validateMiddleware } from '../../common/middleware/validation.middleware.js';
+import { authMiddleware } from '../../common/middleware/auth.middleware.js';
 import { body } from 'express-validator';
 import { SchoolRange, SchoolBoard, SchoolShift } from '../../common/constants.js';
 
@@ -60,20 +61,10 @@ const createSchoolValidation = [
   body('isHeadCampus').optional().isBoolean().withMessage('isHeadCampus must be a boolean'),
   body('parentSchoolId').optional().isMongoId().withMessage('Invalid parent school ID'),
   body('banner').optional().trim().isString(),
-
-  // Admin user information
-  body('admin')
-    .notEmpty().withMessage('Admin information is required')
-    .isObject().withMessage('Admin must be an object'),
-  body('admin.firstName').trim().notEmpty().withMessage('Admin first name is required').isString(),
-  body('admin.lastName').trim().notEmpty().withMessage('Admin last name is required').isString(),
-  body('admin.email').trim().notEmpty().withMessage('Admin email is required').isEmail().withMessage('Invalid admin email'),
-  body('admin.password')
-    .notEmpty().withMessage('Admin password is required')
-    .isString().isLength({ min: 8 }).withMessage('Admin password must be at least 8 characters long'),
 ];
 
-router.post('/', createSchoolValidation, validateMiddleware, schoolController.create);
+router.post('/', authMiddleware, createSchoolValidation, validateMiddleware, schoolController.create);
+router.post('/register', authMiddleware, createSchoolValidation, validateMiddleware, schoolController.create);
 router.get('/', schoolController.findAll);
 router.get('/:id', schoolController.findOne);
 router.get('/domain/:domain', schoolController.findOneByDomain);

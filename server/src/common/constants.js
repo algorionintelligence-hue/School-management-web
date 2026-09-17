@@ -119,6 +119,15 @@ export const ClassStream = {
   COMMERCE: "Commerce",
 };
 
+export const Religion = Object.freeze({
+  ISLAM: 'islam',
+  CHRISTIANITY: 'christianity',
+  HINDUISM: 'hinduism',
+  SIKHISM: 'sikhism',
+  BUDDHISM: 'buddhism',
+  OTHER: 'other',
+});
+
 
 // src/modules/subjects/subject.constants.js
 

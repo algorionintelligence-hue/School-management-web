@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { GradeLevel, Section, BloodGroup } from '../../common/constants.js';
+import { GradeLevel, Section, BloodGroup, Religion } from '../../common/constants.js';
 
 const studentProfileSchema = new Schema(
   {
@@ -29,6 +29,13 @@ const studentProfileSchema = new Schema(
     admissionDate: { type: Date },
     bloodGroup: { type: String, enum: Object.values(BloodGroup), trim: true },
     medicalNotes: { type: String, trim: true },
+    hasTc: { type: Boolean, default: false },
+    nationality: { type: String, trim: true },
+    religion: { type: String, enum: Object.values(Religion), trim: true },
+    academicSession: { type: String, trim: true },
+    emergencyContactName: { type: String, trim: true },
+    emergencyContactPhone: { type: String, trim: true },
+    previousSchool: { type: String, trim: true },
     isAlumni: { type: Boolean, default: false },
   },
   { timestamps: true }

@@ -90,7 +90,7 @@ export class SchoolService {
       await session.commitTransaction();
 
       try {
-        var emailMetaData = await sendVerificationEmail({
+        await sendVerificationEmail({
           to: createdAdmin.email,
           firstName: createdAdmin.firstName,
           verificationToken,
@@ -129,9 +129,9 @@ export class SchoolService {
           id: createdAdmin._id,
           email: createdAdmin.email,
           role: createdAdmin.role,
-          emailVerified: createdAdmin.emailVerified ?? 'false',
+          emailVerified: createdAdmin.emailVerified,
           verificationToken: verificationToken,
-          verificationUrl: emailMetaData.verificationUrl
+          verificationUrl: verifcia
         }
       };
     } catch (error) {

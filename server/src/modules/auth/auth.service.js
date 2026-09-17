@@ -2,7 +2,7 @@ import { User } from '../user/user.schema.js';
 import { School } from '../school/school.schema.js';
 import { Teacher } from '../teacher/teacher.schema.js';
 import { Student } from '../student/student.schema.js';
-import { UnauthorizedException, NotFoundException, BadRequestException } from '../../common/errors/HttpException.js';
+import { UnauthorizedException, NotFoundException, BadRequestException, ConflictException } from '../../common/errors/HttpException.js';
 import { comparePassword, hashPassword } from '../../common/utils/password.util.js';
 import { generateToken, verifyToken } from '../../common/utils/jwt.util.js';
 import { UserRole } from '../../common/constants.js';
@@ -12,49 +12,153 @@ import { generateVerificationToken, hashVerificationToken } from '../../common/u
 import { sendVerificationEmail, sendPasswordResetEmail } from '../../common/utils/email-service.js';
 
 export class AuthService {
-  async login(loginDto) {
-    const { email, password, domain } = loginDto;
+  async signup(signupDto) {
+    const { email, password, firstName, lastName } = signupDto;
+    const cleanEmail = email.toLowerCase().trim();
 
-    // 1. First find the school by domain
-    const school = await School.findOne({ 
-      domain: domain.toLowerCase().trim(), 
-    });
-
-    if (!school) {
-      throw new UnauthorizedException('Invalid domain or school is inactive');
+    const existingUser = await User.findOne({ email: cleanEmail });
+    if (existingUser) {
+      if (existingUser.schoolId) {
+        throw new ConflictException('An account with this email already exists.');
+      }
+      if (existingUser.emailVerified) {
+        throw new ConflictException('Email is already verified. Please log in to complete school registration.');
+      }
+      // Unverified user without school -> Re-send verification email
+      const rawToken = await this.createEmailVerificationToken(existingUser._id);
+      try {
+        await sendVerificationEmail({
+          to: existingUser.email,
+          firstName: existingUser.firstName,
+          verificationToken: rawToken,
+        });
+      } catch (err) {
+        console.error('Failed to send verification email:', err.message);
+      }
+      return {
+        message: 'A verification email has been re-sent. Please check your inbox.',
+      };
     }
 
-    // 2. Find the user belonging to THIS school using school._id & email
+    const passwordHash = await hashPassword(password);
+    const user = await User.create({
+      email: cleanEmail,
+      passwordHash,
+      firstName,
+      lastName,
+      role: UserRole.ADMIN,
+      schoolId: null,
+      isActive: true,
+      emailVerified: false,
+    });
+
+    const rawToken = await this.createEmailVerificationToken(user._id);
+    try {
+      await sendVerificationEmail({
+        to: user.email,
+        firstName: user.firstName,
+        verificationToken: rawToken,
+      });
+    } catch (err) {
+      console.error('Failed to send verification email:', err.message);
+    }
+
+    return {
+      message: 'Registration successful. Please check your email to verify your account.',
+      userId: user._id,
+    };
+  }
+
+  async login(loginDto) {
+    const { email, password, domain } = loginDto;
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Case 1: Domain provided -> Tenant login
+    if (domain) {
+      const school = await School.findOne({
+        domain: domain.toLowerCase().trim(),
+      });
+
+      if (!school) {
+        throw new UnauthorizedException('Invalid domain or school is inactive');
+      }
+
+      const user = await User.findOne({
+        schoolId: school._id,
+        email: cleanEmail,
+      }).select('+passwordHash');
+
+      if (!user) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      const isMatch = await comparePassword(password, user.passwordHash);
+      if (!isMatch) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      await User.findByIdAndUpdate(user._id, { lastLoginAt: new Date() });
+
+      let profile = null;
+      if (user.role === UserRole.TEACHER) {
+        profile = await Teacher.findOne({ userId: user._id, schoolId: school._id });
+      } else if (user.role === UserRole.STUDENT) {
+        profile = await Student.findOne({ userId: user._id, schoolId: school._id });
+      }
+
+      const payload = {
+        userId: user._id,
+        schoolId: school._id,
+        role: user.role,
+        email: user.email,
+      };
+
+      const token = generateToken(payload);
+
+      return {
+        token,
+        user: {
+          userId: user._id,
+          schoolId: school._id,
+          role: user.role,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          profile,
+        },
+      };
+    }
+
+    // Case 2: No domain provided -> Onboarding Admin Login
     const user = await User.findOne({
-      schoolId: school._id,
-      email: email.toLowerCase().trim(),
+      email: cleanEmail,
+      role: UserRole.ADMIN,
     }).select('+passwordHash');
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials or domain required for non-admin login');
     }
 
-    // 3. Verify password
     const isMatch = await comparePassword(password, user.passwordHash);
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // 4. Update last login timestamp
-    await User.findByIdAndUpdate(user._id, { lastLoginAt: new Date() });
-
-    // 5. Load role-specific profile scoped to the tenant
-    let profile = null;
-    if (user.role === UserRole.TEACHER) {
-      profile = await Teacher.findOne({ userId: user._id, schoolId: school._id });
-    } else if (user.role === UserRole.STUDENT) {
-      profile = await Student.findOne({ userId: user._id, schoolId: school._id });
+    if (!user.emailVerified) {
+      throw new UnauthorizedException('Email is not verified. Please verify your email before logging in.');
     }
 
-    // 6. Generate JWT payload with tenant context
+    await User.findByIdAndUpdate(user._id, { lastLoginAt: new Date() });
+
+    let schoolId = user.schoolId;
+    let school = null;
+    if (schoolId) {
+      school = await School.findById(schoolId);
+    }
+
     const payload = {
       userId: user._id,
-      schoolId: school._id,
+      schoolId: schoolId || null,
       role: user.role,
       email: user.email,
     };
@@ -65,12 +169,14 @@ export class AuthService {
       token,
       user: {
         userId: user._id,
-        schoolId: school._id,
+        schoolId: schoolId || null,
+        schoolDomain: school ? school.domain : null,
         role: user.role,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        profile,
+        emailVerified: user.emailVerified,
+        requiresSchoolRegistration: !schoolId,
       },
     };
   }
@@ -130,10 +236,19 @@ export class AuthService {
       _id: verificationRecord._id,
     });
 
+    const token = generateToken({
+      userId: user._id,
+      schoolId: user.schoolId || null,
+      role: user.role,
+      email: user.email,
+    });
+
     return {
+      token,
       userId: user._id,
       email: user.email,
       emailVerified: user.emailVerified,
+      requiresSchoolRegistration: !user.schoolId,
     };
   }
 
@@ -159,31 +274,41 @@ export class AuthService {
       throw new BadRequestException("Email is required");
     }
 
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const cleanEmail = email.toLowerCase().trim();
+    console.log(`🔍 [RESEND VERIFICATION]: Searching DB for user email: [${cleanEmail}]`);
+
+    const user = await User.findOne({ email: cleanEmail });
 
     // Always return generic message for security
     const message = "If an account with this email exists, a new verification link has been sent.";
 
     if (!user) {
+      console.log(`⚠️ [RESEND VERIFICATION]: User with email [${cleanEmail}] NOT FOUND in database! No email sent.`);
       return { message };
     }
 
     if (user.emailVerified) {
+      console.log(`ℹ️ [RESEND VERIFICATION]: User [${cleanEmail}] is ALREADY VERIFIED (emailVerified: true). No email sent.`);
       return { message: "Email is already verified." };
     }
 
+    console.log(`🚀 [RESEND VERIFICATION]: User found! Generating token and sending verification email...`);
     const rawToken = await this.createEmailVerificationToken(user._id);
 
-    await sendVerificationEmail({
-      to: user.email,
-      firstName: user.firstName,
-      verificationToken: rawToken,
-    });
+    try {
+      await sendVerificationEmail({
+        to: user.email,
+        firstName: user.firstName,
+        verificationToken: rawToken,
+      });
+    } catch (err) {
+      console.log(`Email sending FAILED for user ${cleanEmail}:`, err.message);
+    }
 
     return { message };
   }
 
-  async requestPasswordReset(email) {
+  async forgetPassword(email) {
     if (!email || typeof email !== "string") {
       throw new BadRequestException("Email is required");
     }
@@ -206,11 +331,15 @@ export class AuthService {
       expiresAt,
     });
 
-    await sendPasswordResetEmail({
+    try {
+      await sendPasswordResetEmail({
       to: user.email,
       firstName: user.firstName,
       resetToken: rawToken,
     });
+    } catch(err) {
+      console.err(`failed to forget password: ${err.message}`)
+    }
 
     return { message };
   }

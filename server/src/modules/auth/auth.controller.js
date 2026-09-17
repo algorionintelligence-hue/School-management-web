@@ -3,10 +3,17 @@ import { authService } from './auth.service.js';
 import { body, query } from 'express-validator';
 import { BadRequestException } from '../../common/errors/HttpException.js';
 
+export const signupValidation = [
+  body('email').trim().notEmpty().withMessage('Email is required').isEmail().withMessage('Invalid email format'),
+  body('password').trim().notEmpty().withMessage('Password is required').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+  body('firstName').trim().notEmpty().withMessage('First name is required').isString(),
+  body('lastName').trim().notEmpty().withMessage('Last name is required').isString(),
+];
+
 export const loginValidation = [
   body('email').trim().notEmpty().withMessage('Email is required').isEmail().withMessage('Invalid email format'),
   body('password').trim().notEmpty().withMessage('Password is required'),
-  body('domain').trim().notEmpty().withMessage('Domain is required').isString(),
+  body('domain').optional().trim().isString(),
 ];
 
 export const resendEmailValidation = [
@@ -27,6 +34,19 @@ export const verifyEmailValidation = [
 ];
 
 export class AuthController {
+  async signup(req, res, next) {
+    try {
+      const result = await authService.signup(req.body);
+      res.status(StatusCodes.CREATED).json({
+        status: 'success',
+        message: result.message,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async login(req, res, next) {
     try {
       const result = await authService.login(req.body);
@@ -65,9 +85,9 @@ export class AuthController {
     }
   }
 
-  async requestPasswordReset(req, res, next) {
+  async forgetPassword(req, res, next) {
     try {
-      const result = await authService.requestPasswordReset(req.body.email);
+      const result = await authService.forgetPassword(req.body.email);
       res.status(StatusCodes.OK).json({
         status: 'success',
         message: result.message,

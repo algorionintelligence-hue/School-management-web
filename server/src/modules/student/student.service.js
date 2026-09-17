@@ -3,6 +3,7 @@ import { Student } from './student.schema.js';
 import { User } from '../user/user.schema.js';
 import { ConflictException, NotFoundException } from '../../common/errors/HttpException.js';
 import { hashPassword } from '../../common/utils/password.util.js';
+import { generateUniqueRollNumber } from '../../common/utils/rollNumber.util.js';
 
 export class StudentService {
 
@@ -19,8 +20,8 @@ export class StudentService {
       throw new ConflictException('Student with this email already exists in this school');
     }
 
-    // Auto-generate system roll number and verify it is unique and not already assigned this function in utils and also i asked you to only if the rollnumber doesn't
-    const rollNumber = await this.generateUniqueRollNumber(schoolId);
+    // Auto-generate system roll number and verify it is unique
+    const rollNumber = await generateUniqueRollNumber(schoolId);
 
     // Hash password
     const passwordHash = await hashPassword(createStudentDto.password);
@@ -55,6 +56,13 @@ export class StudentService {
       admissionDate: createStudentDto.admissionDate ? new Date(createStudentDto.admissionDate) : undefined,
       bloodGroup: createStudentDto.bloodGroup,
       medicalNotes: createStudentDto.medicalNotes,
+      hasTc: createStudentDto.hasTc !== undefined ? createStudentDto.hasTc : false,
+      nationality: createStudentDto.nationality,
+      religion: createStudentDto.religion,
+      academicSession: createStudentDto.academicSession,
+      emergencyContactName: createStudentDto.emergencyContactName,
+      emergencyContactPhone: createStudentDto.emergencyContactPhone,
+      previousSchool: createStudentDto.previousSchool,
       isAlumni: false,
     });
 

@@ -5,7 +5,7 @@ export async function sendVerificationEmail({
   firstName,
   verificationToken,
 }) {
-  const clientBaseUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+  const clientBaseUrl = process.env.CLIENT_URL || `https://scool-management.duckdns.org`;
   const verificationUrl = new URL(
     "/auth/verify-email",
     clientBaseUrl
@@ -13,8 +13,11 @@ export async function sendVerificationEmail({
 
   verificationUrl.searchParams.set("token", verificationToken);
 
+  const fromAddress = process.env.SMTP_FROM || "krr862913@gmail.com";
+  console.log(`📧 Attempting to send verification email to [${to}] from [${fromAddress}]...`);
+
   const info = await emailTransporter.sendMail({
-    from: process.env.SMTP_FROM || "noreply@school.com",
+    from: fromAddress,
     to,
     subject: "Verify your email address",
     text: `Hello ${firstName || "there"},
@@ -57,6 +60,8 @@ If you did not create this account, you can safely ignore this email.
     </p>`,
   });
 
+  console.log("✅ [EMAIL SENT]:", info.messageId || info.response);
+
   return {info, verificationUrl};
 }
 
@@ -65,7 +70,7 @@ export async function sendPasswordResetEmail({
   firstName,
   resetToken,
 }) {
-  const clientBaseUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+  const clientBaseUrl = process.env.CLIENT_URL || 'https://scool-management.duckdns.org';
   const resetUrl = new URL(
     "/auth/reset-password",
     clientBaseUrl
@@ -74,7 +79,7 @@ export async function sendPasswordResetEmail({
   resetUrl.searchParams.set("token", resetToken);
 
   const info = await emailTransporter.sendMail({
-    from: process.env.SMTP_FROM || "noreply@school.com",
+    from: process.env.SMTP_FROM || "krr862913@gmail.com",
     to,
     subject: "Reset your password",
     text: `Hello ${firstName || "there"},

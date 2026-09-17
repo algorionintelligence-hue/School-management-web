@@ -4,7 +4,7 @@ import { authMiddleware } from '../../common/middleware/auth.middleware.js';
 import { requireRoles } from '../../common/middleware/role.middleware.js';
 import { validateMiddleware } from '../../common/middleware/validation.middleware.js';
 import { body } from 'express-validator';
-import { GradeLevel, Section, BloodGroup, Gender, GuardianRelation, UserRole } from '../../common/constants.js';
+import { GradeLevel, Section, BloodGroup, Gender, GuardianRelation, UserRole, Religion } from '../../common/constants.js';
 
 const router = Router();
 
@@ -26,6 +26,13 @@ const createStudentValidation = [
   body('admissionDate').optional().isISO8601(),
   body('bloodGroup').optional().isIn(Object.values(BloodGroup)).withMessage(`Blood group must be one of: ${Object.values(BloodGroup).join(', ')}`),
   body('medicalNotes').optional().trim(),
+  body('hasTc').optional().isBoolean().withMessage('hasTc must be a boolean'),
+  body('nationality').optional().trim().isString(),
+  body('religion').optional().isIn(Object.values(Religion)).withMessage(`Religion must be one of: ${Object.values(Religion).join(', ')}`),
+  body('academicSession').optional().trim().isString(),
+  body('emergencyContactName').optional().trim().isString(),
+  body('emergencyContactPhone').optional().trim().isString(),
+  body('previousSchool').optional().trim().isString(),
 ];
 
 const updateStudentValidation = [
@@ -45,6 +52,13 @@ const updateStudentValidation = [
   body('admissionDate').optional().isISO8601(),
   body('bloodGroup').optional().isIn(Object.values(BloodGroup)).withMessage(`Blood group must be one of: ${Object.values(BloodGroup).join(', ')}`),
   body('medicalNotes').optional().trim(),
+  body('hasTc').optional().isBoolean().withMessage('hasTc must be a boolean'),
+  body('nationality').optional().trim().isString(),
+  body('religion').optional().isIn(Object.values(Religion)).withMessage(`Religion must be one of: ${Object.values(Religion).join(', ')}`),
+  body('academicSession').optional().trim().isString(),
+  body('emergencyContactName').optional().trim().isString(),
+  body('emergencyContactPhone').optional().trim().isString(),
+  body('previousSchool').optional().trim().isString(),
 ];
 
 router.use(authMiddleware);
